@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import clarifai from 'clarifai';
 import Navigation from './Component/navigation/navigation';
 import Logo from './Component/Logo/Logo';
 import ImageLinkForm from './Component/imageLinkForm/imageLinkForm';
@@ -7,11 +6,10 @@ import Rank from './Component/Rank/Rank';
 import FaceRecognition from './Component/FaceRecognition/FaceRecognition';
 import SignIn from './Component/SignIn/SignIn';
 import Register from './Component/register/register';
-
-
-
-
 import './App.css';
+
+
+
 
 class App extends Component{
   constructor() {
@@ -22,8 +20,28 @@ class App extends Component{
       box: {},
       route: 'signin',
       isSignedIn: false,
+      users: {
+        id:'',
+            name: '',
+            email: '',
+            entries: 0,
+            joined: ''
+      }
     }
   }
+
+
+
+loadUser = (data) => {
+  this.setState({users: 
+    {id: data.id,
+    name: data.name,
+    email: data.email,
+    enteries: data.enteries,
+    joined: data.joined,
+}})
+}
+
 
 calculateFaceLocation = (data) => {
 
@@ -35,34 +53,19 @@ calculateFaceLocation = (data) => {
 
 onButtonSubmit = () => {
   this.setState({imageUrl: this.state.input})
-  const raw = JSON.stringify({
-    "user_app_id": {
-          "user_id": "d07jjd23e48i",
-          "app_id": "2c2b52a252d5457d8e486b25e06fe6eb"
-      },
-    "inputs": [
-      {
-        "data": {
-          "image": {
-            "url": "https://samples.clarifai.com/metro-north.jpg"
-          }
-        }
-      }
-    ]
-  });
+  fetch('http://localhost:3001/image', {
+    method:'put',
+    headers:{'content-Type': 'application/json'},
+    body:JSON.stringify({
+      id: this.state.users.id
+    })})
+    .then(response => response.json())
+    .then(count => {
+      this.setState(Object.assign(this.state.users,{enteries:count}))
+    })
+
+    
   
-  const requestOptions = {
-    method: 'POST',
-    headers: {
-      'Accept': 'application/json',
-      'Authorization': 'ede503b5645547ec8c36162fae906b99'
-    },
-    body: raw
-  };
-  fetch("https://api.clarifai.com/v2/aaa03c23b3724a16a56b629203edc62c/outputs", requestOptions)
-  .then(response => response.text())
-  .then(result => console.log(JSON.parse(result, null, 2).outputs[0].data))
-  .catch(error => console.log('error', error));
 }
 
 
@@ -86,7 +89,8 @@ onRouteChange =(route) => {
        { route === 'home' 
        ? <div>
        <Logo />
-       <Rank />
+       <Rank make={this.state.users.name}
+       enteries={this.state.users.enteries} />
     <ImageLinkForm 
        onInputChange={this.onInputChange} 
        onButtonSubmit={this.onButtonSubmit}/>
@@ -94,8 +98,10 @@ onRouteChange =(route) => {
     </div>
          :(
           route === 'signin' ?
-          <SignIn onRouteChange={this.onRouteChange}/>
-          :<Register onRouteChange={this.onRouteChange}/>
+          <SignIn onRouteChange={this.onRouteChange}
+          loadUser ={this.loadUser}/>
+          :<Register loadUser ={this.loadUser}
+          onRouteChange={this.onRouteChange}/>
          )
   }
     </div>
