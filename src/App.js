@@ -9,25 +9,26 @@ import Register from './Component/register/register';
 import './App.css';
 
 
-
+const initialSetState = {
+    input: '',
+    imageUrl: "",
+    box: {},
+    route: 'signin',
+    isSignedIn: false,
+    users: {
+      id:'',
+          name: '',
+          email: '',
+          entries: 0,
+          joined: ''
+    }
+  }
 
 class App extends Component{
   constructor() {
     super();
-    this.state = {
-      input: '',
-      imageUrl: "",
-      box: {},
-      route: 'signin',
-      isSignedIn: false,
-      users: {
-        id:'',
-            name: '',
-            email: '',
-            entries: 0,
-            joined: ''
-      }
-    }
+    this.state =  initialSetState
+    
   }
 
 
@@ -70,13 +71,13 @@ onButtonSubmit = () => {
 
 
 onRouteChange =(route) => {
-  this.setState({route: route});
-  if ( this.state.route === 'signout'){
-    this.setState({isSignedIn: false})
+  if ( route === 'signout'){
+    this.setState(initialSetState)
   }
-  else if (this.state.route === 'home'){
+  else if (route === 'home'){
     this.setState({isSignedIn: true})
   }
+  this.setState({route: route});
 }
 
   render() {

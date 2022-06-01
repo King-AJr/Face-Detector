@@ -33,8 +33,7 @@ onSubmitSignIn = () => {
   .then(response =>response.json())
   .then(users => {
     if(users){
-      this.props.loadUser(users)
-      console.log(users);
+      this.props.loadUser(users);
       this.props.onRouteChange ('home');
     }
     else{ console.log('no response')}
